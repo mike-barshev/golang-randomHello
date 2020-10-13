@@ -6,18 +6,28 @@ import (
 	"time"
 )
 
-func privet(p chan string) {
-	fmt.Println(<-p)
+func privet() {
+	fmt.Println("Привет")
+}
+
+func outRandTen(p chan bool) {
+	rand.Seed(time.Now().UnixNano())
+	r := rand.Intn(10)
+	time.Sleep(time.Duration(r) * time.Second)
+	p <- true
 }
 
 func main() {
-	p := make(chan string)
-	rand.Seed(time.Now().UnixNano())
-	r := rand.Intn(10)
-	go privet(p)
-	time.Sleep(time.Duration(r) * time.Second)
-	p <- "Привет"
-	time.Sleep(time.Duration(r) * time.Second)
-	close(p)
-
+	p := make(chan bool)
+	go outRandTen(p)
+	for {
+		select {
+		case val := <-p:
+			if val {
+				return
+			}
+		default:
+			go privet()
+		}
+	}
 }
