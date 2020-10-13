@@ -29,5 +29,6 @@ func main() {
 		default:
 			go privet()
 		}
+		time.Sleep(time.Second)
 	}
 }
